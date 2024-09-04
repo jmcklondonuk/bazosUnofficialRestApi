@@ -1,4 +1,4 @@
-# Bazos.cz REST Api 0.8.1
+# Bazos.cz REST Api 0.8.2
 This is a REST API for interacting with bazos.cz
 
 ## Domain model

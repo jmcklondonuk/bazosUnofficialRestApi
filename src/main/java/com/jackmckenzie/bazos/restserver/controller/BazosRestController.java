@@ -83,8 +83,8 @@ public class BazosRestController {
         }
     }
 
-    @DeleteMapping("/delete-advertisement")
-    public ResponseEntity<Boolean> deleteAdvertisement(@RequestParam("url") String url, @RequestParam("password") String password) throws BazosException {
+    @PostMapping("/delete-advertisement")
+    public ResponseEntity<Boolean> deleteAdvertisement(String url, String password) throws BazosException {
         try {
             boolean deleted = bazosScraper.deleteAdvertisement(url, password);
             return ResponseEntity.ok(deleted);
