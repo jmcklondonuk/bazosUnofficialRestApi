@@ -17,3 +17,5 @@ To build a docker image, run
 When you run the project, the API is documented using swagger:
 
 http://127.0.0.1:8080/swagger-ui/index.html
+
+![image](bazos_rest_api.png)
