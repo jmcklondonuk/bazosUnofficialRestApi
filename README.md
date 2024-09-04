@@ -2,7 +2,7 @@
 This is a REST API for interacting with bazos.cz
 
 ## Domain model
-![image](domain_model.png)
+![image](domain_model.png =250x)
 
 ## Build
 I used JDK 17 and IntelliJ.
