@@ -63,7 +63,7 @@ public class BazosRestController {
         }
     }
 
-    @PostMapping("/scrape-own-advertisement/{url}/{password}")
+    @PostMapping("/scrape-own-advertisement")
     public ResponseEntity<Advertisement> scrapeOwnAdvertisement(String url, String password) throws BazosException {
         try {
             Advertisement advertisement = bazosScraper.scrapeOwnAdvertisement(url, password);
