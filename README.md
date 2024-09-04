@@ -1,6 +1,9 @@
 # Bazos Unofficial REST Api 0.8.0
 This is a REST API for interacting with bazos.cz
 
+## Domain model
+![image](domain_model.png)
+
 ## Build
 I used JDK 17 and IntelliJ.
 
