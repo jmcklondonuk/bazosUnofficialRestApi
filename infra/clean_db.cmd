@@ -1,17 +1,17 @@
 @echo off
-if not exist ..\mydatabase.db goto noDatabaseExists
+if not exist ..\cookies.db goto noDatabaseExists
 if not exist clean.db goto createCleanDatabase
 goto cleanTheDatabase
 
 goto end
 :createCleanDatabase
 echo Creating a copy of a clean database...
-copy ..\mydatabase.db clean.db
+copy ..\cookies.db clean.db
 goto end
 
 :cleanTheDatabase
 echo Cleaning the database...
-copy clean.db ..\mydatabase.db
+copy clean.db ..\cookies.db
 goto end
 
 :noDatabaseExists
