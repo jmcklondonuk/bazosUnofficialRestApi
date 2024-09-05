@@ -1,8 +1,8 @@
 package com.jackmckenzie.bazos.restserver.controller;
 
 import com.jackmckenzie.bazos.restserver.entity.BazosException;
+import com.jackmckenzie.bazos.restserver.entity.UploadAdvertisementRequest;
 import com.jackmckenzie.bazos.scraper.entity.Advertisement;
-import com.jackmckenzie.bazos.scraper.entity.Seller;
 import com.jackmckenzie.bazos.scraper.service.BazosScraper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +43,8 @@ public class BazosRestController {
 
     @GetMapping("/check-credentials/{bid}/{bkod}")
     public ResponseEntity<Boolean> checkCredentials(@PathVariable("bid") long bid, @PathVariable("bkod") String bkod) throws BazosException {
-        boolean valid = false;
         try {
-            valid = bazosScraper.isAuthenticated(bid, bkod);
+            boolean valid = bazosScraper.isAuthenticated(bid, bkod);
             return ResponseEntity.ok(valid);
         } catch (InterruptedException | IOException e) {
             throw new BazosException("Unable to check credentials", e);
@@ -73,10 +72,10 @@ public class BazosRestController {
         }
     }
 
-    @PostMapping("/upload-advertisement")
-    public ResponseEntity<Integer> uploadAdvertisement(long bid, String bkod, Advertisement advertisement, Seller seller) throws BazosException {
+    @PostMapping(value = "/upload-advertisement")
+    public ResponseEntity<Integer> uploadAdvertisement(@RequestBody UploadAdvertisementRequest request) throws BazosException {
         try {
-            Integer newId = bazosScraper.postAdvertisement(bid, bkod, advertisement, seller);
+            Integer newId = bazosScraper.postAdvertisement(request.getBid(), request.getBkod(), request.getAdvertisement(), request.getSeller());
             return ResponseEntity.ok(newId);
         } catch (InterruptedException | IOException e) {
             throw new BazosException("Unable to upload advertisement", e);

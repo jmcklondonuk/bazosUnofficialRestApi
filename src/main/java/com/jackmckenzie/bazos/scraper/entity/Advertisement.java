@@ -27,14 +27,13 @@ public class Advertisement {
     private SubCategory subCategory;
 
     public void setDate(String date) throws ParseException {
-        String normalized = date.substring(3, date.length() - 1).replace(" ", "");
         SimpleDateFormat dateFormat = new SimpleDateFormat("d.M.yyyy");
-        dateFormat.parse(normalized); // this validates the date
-        this.date = normalized;
+        dateFormat.parse(date); // this validates the date
+        this.date = date;
     }
 
     public void setPrice(String price) {
-        this.price = Float.parseFloat(price.substring(0, price.length() - 3).replace(" ", ""));
+        this.price = Float.parseFloat(price);
     }
 
     @Override

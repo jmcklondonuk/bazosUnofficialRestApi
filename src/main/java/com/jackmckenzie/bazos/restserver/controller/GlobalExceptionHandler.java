@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
     @ExceptionHandler(BazosException.class)
     public ResponseEntity<String> handleBazosException(BazosException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

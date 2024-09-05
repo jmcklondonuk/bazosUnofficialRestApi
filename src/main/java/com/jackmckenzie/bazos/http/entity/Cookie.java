@@ -13,6 +13,6 @@ public class Cookie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String value;
+    private String content;
     private String domain;
 }

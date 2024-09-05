@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.jackmckenzie'
-version = '0.8.2'
+version = '0.8.3'
 description = 'This is an unofficial REST API for bazos.cz'
 sourceCompatibility = '17'
 
@@ -27,7 +27,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.h2database:h2'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }

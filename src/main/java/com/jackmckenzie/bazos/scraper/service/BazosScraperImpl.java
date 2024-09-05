@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -23,7 +25,6 @@ import java.util.regex.Pattern;
 public class BazosScraperImpl implements BazosScraper {
     private HttpService httpService;
 
-    @Autowired
     public BazosScraperImpl(HttpService httpService) {
         this.httpService = httpService;
     }
@@ -113,7 +114,12 @@ public class BazosScraperImpl implements BazosScraper {
 
         advertisement.setUrl(url);
         try {
-            advertisement.setDate(document.select(".inzeratydetnadpis .velikost10").text());
+            String date = document.select(".inzeratydetnadpis .velikost10").text();
+            if (date.length() > 5) {
+                date = date.substring(3, date.length() - 1).replace(" ", "");
+            }
+
+            advertisement.setDate(date);
         } catch (ParseException e) {
             throw new IOException("Invalid date!", e);
         }
@@ -122,6 +128,7 @@ public class BazosScraperImpl implements BazosScraper {
         Element priceElement = document.select("tr:nth-child(5)").first();
         if (priceElement != null) {
             String price = priceElement.select("td:nth-child(2) b").text();
+            price = price.substring(0, price.length() - 3).replace(" ", "");
             advertisement.setPrice(price);
         } else {
             throw new IOException("Price cannot be parsed and is null!");
@@ -171,7 +178,7 @@ public class BazosScraperImpl implements BazosScraper {
     }
 
     @Override
-    public Integer postAdvertisement(long bid, String bkod, Advertisement advertisement, Seller seller) throws InterruptedException, IOException {
+    public Integer postAdvertisement(Long bid, String bkod, Advertisement advertisement, Seller seller) throws InterruptedException, IOException {
         String cookie = "bid=" + bid + "; bkod=" + bkod;
 
         List<String> uploadedPhotos = new ArrayList<>();
@@ -255,6 +262,6 @@ public class BazosScraperImpl implements BazosScraper {
                 "heslobazar", password,
                 "idad", id,
                 "administrace", "Vymazat");
-        return response.body().contains("vymazan");
+        return response.body().contains("Inzerát byl vymazán");
     }
 }

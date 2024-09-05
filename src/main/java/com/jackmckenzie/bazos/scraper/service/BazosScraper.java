@@ -18,7 +18,7 @@ public interface BazosScraper {
 
     Advertisement scrapeOwnAdvertisement(String url, String password) throws InterruptedException, IOException;
 
-    Integer postAdvertisement(long bid, String bkod, Advertisement advertisement, Seller seller) throws InterruptedException, IOException;
+    Integer postAdvertisement(Long bid, String bkod, Advertisement advertisement, Seller seller) throws InterruptedException, IOException;
 
     boolean deleteAdvertisement(String url, String password) throws InterruptedException, IOException;
 }

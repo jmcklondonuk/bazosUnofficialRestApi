@@ -6,7 +6,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,10 +31,10 @@ public class HttpServiceImpl implements HttpService {
 
     private HttpClient client;
 
-    @Autowired
     private CookieRepository cookieRepository;
 
-    public HttpServiceImpl() {
+    public HttpServiceImpl(CookieRepository cookieRepository) {
+        this.cookieRepository = cookieRepository;
         this.client = HttpClient.newBuilder()
                 .build();
     }
@@ -49,7 +48,7 @@ public class HttpServiceImpl implements HttpService {
         List<Cookie> storedCookies = this.cookieRepository.findByDomain(cookieDomain);
         Map<String, String> cookies = new HashMap<>();
         for (Cookie cookie : storedCookies) {
-            cookies.put(cookie.getName(), cookie.getValue());
+            cookies.put(cookie.getName(), cookie.getContent());
         }
 
         if (!cookies.isEmpty()) {
@@ -81,10 +80,10 @@ public class HttpServiceImpl implements HttpService {
                 cookie = new Cookie();
                 cookie.setDomain(cookieDomain);
                 cookie.setName(entry.getKey());
-                cookie.setValue(entry.getValue());
+                cookie.setContent(entry.getValue());
             } else {
                 LOGGER.debug("Updating the key to a new value: {}", entry.getKey());
-                cookie.setValue(entry.getValue());
+                cookie.setContent(entry.getValue());
             }
 
             cookieRepository.save(cookie);
@@ -158,14 +157,14 @@ public class HttpServiceImpl implements HttpService {
     @Override
     public String uploadFilesWithCookie(String url, String cookie, String name, Map<String, byte[]> files, String... optionalKeyValsPostData) throws InterruptedException, IOException {
         Random random = new Random();
-        String boundary = "-----------------------------" + Math.abs(random.nextLong());
+        String boundary = "---------------------------" + Math.abs(random.nextLong());
 
         ByteArrayOutputStream requestBody = new ByteArrayOutputStream();
         for (int i = 0; i < optionalKeyValsPostData.length; i += 2) {
             String key = optionalKeyValsPostData[i];
             String value = optionalKeyValsPostData[i + 1];
 
-            requestBody.write((boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+            requestBody.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
             requestBody.write(("Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
             requestBody.write((value + "\r\n").getBytes(StandardCharsets.UTF_8));
         }
@@ -174,7 +173,7 @@ public class HttpServiceImpl implements HttpService {
             String fileName = entry.getKey();
             byte[] fileData = entry.getValue();
 
-            requestBody.write((boundary + "\r\n").getBytes(StandardCharsets.US_ASCII));
+            requestBody.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.US_ASCII));
             requestBody.write(("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + fileName + "\"\r\n").getBytes(StandardCharsets.US_ASCII));
             requestBody.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
 
@@ -182,7 +181,7 @@ public class HttpServiceImpl implements HttpService {
             requestBody.write("\r\n".getBytes(StandardCharsets.US_ASCII));
         }
 
-        requestBody.write((boundary + "--\r\n").getBytes(StandardCharsets.US_ASCII));
+        requestBody.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.US_ASCII));
 
         URI uri;
         try {
