@@ -8,14 +8,11 @@ import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -38,11 +35,15 @@ public class BazosScraperImpl implements BazosScraper {
 
     @Override
     public String requestAuthenticationCode(String phone) throws InterruptedException, IOException {
+        if (!phone.startsWith("+")) {
+            throw new IllegalArgumentException("Phone number must start with a country prefix, i.e. +420!");
+        }
+
         Connection.Response response = httpService.downloadHtmlForAuthentication("https://reality.bazos.cz/pridat-inzerat.php",
                 true, phone, "podminky", "1", "teloverit", phone);
 
         if (response.body().contains("zkuste to pozd")) {
-            throw new IOException("You attempted to verify your phone number too many times. Try again later.");
+            throw new IOException("You have attempted to verify your phone number too many times. Try again later.");
         }
 
         Map<String, String> cookies = ((HttpConnection.Response) response).cookies();
@@ -62,6 +63,10 @@ public class BazosScraperImpl implements BazosScraper {
         Connection.Response response = httpService.downloadHtmlForAuthentication("https://reality.bazos.cz/pridat-inzerat.php",
                 false, phone, "klic", code, "klictelefon", phone);
 
+        if (response.body().contains("Chybně zadaný mobilní klíč")) {
+            throw new IOException("You have entered an invalid code from your phone!");
+        }
+
         Map<String, String> cookies = response.cookies();
         Map<String, String> result = new HashMap<>();
         if (cookies.containsKey("bid") && cookies.containsKey("bkod")) {
@@ -76,7 +81,7 @@ public class BazosScraperImpl implements BazosScraper {
     }
 
     @Override
-    public List<Advertisement> listOwnAdvertisements(String email, String phone, String password) throws InterruptedException, IOException {
+    public List<Advertisement> listOwnAdvertisements(String email, String phone, String password, Boolean downloadPhotos) throws InterruptedException, IOException {
         HttpResponse<String> response = httpService.downloadText("https://www.bazos.cz/moje-inzeraty.php",
                 "email", email, "telefon", String.valueOf(phone));
 
@@ -84,7 +89,7 @@ public class BazosScraperImpl implements BazosScraper {
         Elements elements = Jsoup.parse(html).select("div.inzeraty.inzeratyflex .inzeratynadpis .nadpis a");
         List<Advertisement> ads = new ArrayList<>();
         for (Element element : elements) {
-            ads.add(scrapeOwnAdvertisement(element.attr("href"), password));
+            ads.add(scrapeOwnAdvertisement(element.attr("href"), password, downloadPhotos));
         }
 
         return ads;
@@ -100,7 +105,7 @@ public class BazosScraperImpl implements BazosScraper {
     }
 
     @Override
-    public Advertisement scrapeOwnAdvertisement(String url, String password) throws InterruptedException, IOException {
+    public Advertisement scrapeOwnAdvertisement(String url, String password, Boolean downloadPhotos) throws InterruptedException, IOException {
         HttpResponse<String> response = httpService.downloadText(url);
         String html = response.body();
         Document document = Jsoup.parse(html);
@@ -156,6 +161,9 @@ public class BazosScraperImpl implements BazosScraper {
                 "administrace", "Upravit");
 
         String adEditingHtml = adEditingResponse.body();
+        if (adEditingHtml.contains("Zadali jste špatné heslo"))
+            throw new IOException("Invalid password!");
+
         Document adEditingDocument = Jsoup.parse(adEditingHtml);
         String description = adEditingDocument.select("#popis").text();
 
@@ -165,11 +173,13 @@ public class BazosScraperImpl implements BazosScraper {
         List<Photo> photos = new ArrayList<>();
         for (Element image : images) {
             String imageUrl = image.attr("data-flickity-lazyload");
-            byte[] imageData = httpService.downloadFile(imageUrl);
-
             Photo photo = new Photo();
+            if (downloadPhotos) {
+                byte[] imageData = httpService.downloadFile(imageUrl);
+                photo.setContent(imageData);
+            }
+
             photo.setUrl(imageUrl);
-            photo.setContent(imageData);
             photos.add(photo);
         }
 
@@ -262,6 +272,10 @@ public class BazosScraperImpl implements BazosScraper {
                 "heslobazar", password,
                 "idad", id,
                 "administrace", "Vymazat");
+
+        if (response.body().contains("Zadali jste špatné heslo"))
+            throw new IOException("Invalid password!");
+
         return response.body().contains("Inzerát byl vymazán");
     }
 }

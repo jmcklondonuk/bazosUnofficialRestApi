@@ -2,6 +2,7 @@ package com.jackmckenzie.bazos.http.service;
 
 import com.jackmckenzie.bazos.http.entity.Cookie;
 import com.jackmckenzie.bazos.http.repository.CookieRepository;
+import jakarta.transaction.Transactional;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class HttpServiceImpl implements HttpService {
     }
 
     @Override
+    @Transactional
     public Connection.Response downloadHtmlForAuthentication(String url, boolean clearCookies, String cookieDomain, String... keyValsPostData) throws IOException {
         if (clearCookies)
             cookieRepository.deleteByDomain(cookieDomain);
