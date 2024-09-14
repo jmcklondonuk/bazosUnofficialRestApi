@@ -1,0 +1,444 @@
+openapi: 3.0.1
+info:
+  description: This is a REST API for bazos.cz
+  title: Bazos.cz API
+  version: v0.9.2
+servers:
+  - description: Bazos.cz API
+    url: http://127.0.0.1:8080
+paths:
+  /api/v1/check-credentials/{bid}/{bkod}:
+    get:
+      operationId: checkCredentials
+      parameters:
+        - explode: false
+          in: path
+          name: bid
+          required: true
+          schema:
+            format: int64
+            type: integer
+          style: simple
+        - explode: false
+          in: path
+          name: bkod
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                type: boolean
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Verifies the bazos ID and bazos code are valid. If this fails you need
+        to authenticate again.
+      tags:
+        - authentication
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: authentication
+  /api/v1/request-authentication-code/{phone}:
+    get:
+      operationId: requestAuthenticationCode
+      parameters:
+        - explode: false
+          in: path
+          name: phone
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                type: string
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Requests a code on your phone to authenticate for using bazos.cz
+      tags:
+        - authentication
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: authentication
+  /api/v1/submit-authentication-code/{code}/{phone}:
+    get:
+      operationId: submitAuthenticationCode
+      parameters:
+        - explode: false
+          in: path
+          name: code
+          required: true
+          schema:
+            type: string
+          style: simple
+        - explode: false
+          in: path
+          name: phone
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: "Sends an authentication code, obtained via text message on your phone,\
+        \ back to bazos.cz"
+      tags:
+        - authentication
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: authentication
+  /api/v1/list-own-advertisements/{email}/{phone}/{password}/{downloadPhotos}:
+    get:
+      operationId: listOwnAdvertisements
+      parameters:
+        - explode: false
+          in: path
+          name: email
+          required: true
+          schema:
+            type: string
+          style: simple
+        - explode: false
+          in: path
+          name: phone
+          required: true
+          schema:
+            type: string
+          style: simple
+        - explode: false
+          in: path
+          name: password
+          required: true
+          schema:
+            type: string
+          style: simple
+        - explode: false
+          in: path
+          name: downloadPhotos
+          required: true
+          schema:
+            type: boolean
+          style: simple
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Advertisement'
+                type: array
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Downloads your own advertisements from bazos.cz including photos
+      tags:
+        - advertisements
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: advertisements
+  /api/v1/upload-advertisement:
+    post:
+      operationId: uploadAdvertisement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadRequest'
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                format: int32
+                type: integer
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Uploads an advertisement to bazos.cz
+      tags:
+        - advertisements
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: advertisements
+  /api/v1/scrape-own-advertisement:
+    post:
+      operationId: scrapeOwnAdvertisement
+      parameters:
+        - explode: true
+          in: query
+          name: url
+          required: true
+          schema:
+            type: string
+          style: form
+        - explode: true
+          in: query
+          name: password
+          required: true
+          schema:
+            type: string
+          style: form
+        - explode: true
+          in: query
+          name: downloadPhotos
+          required: true
+          schema:
+            type: boolean
+          style: simple
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Advertisement'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Scrapes your own advertisement from bazos.cz including photos
+      tags:
+        - advertisements
+      x-accepts:
+        - 'application/json'
+      x-tags:
+        - tag: advertisements
+  /api/v1/delete-advertisement:
+    post:
+      operationId: deleteAdvertisement
+      parameters:
+        - explode: true
+          in: query
+          name: url
+          required: true
+          schema:
+            type: string
+          style: form
+        - explode: true
+          in: query
+          name: password
+          required: true
+          schema:
+            type: string
+          style: form
+      responses:
+        "200":
+          content:
+            'application/json':
+              schema:
+                type: boolean
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Deletes your advertisement from bazos.cz
+      tags:
+        - advertisements
+      x-accepts:
+        - application/json
+      x-tags:
+        - tag: advertisements
+components:
+  schemas:
+    Advertisement:
+      example:
+        date: date
+        subCategory:
+          mainCategory:
+            id: 1
+            title: title
+            url: url
+          title: title
+          url: url
+        price: 6.0274563
+        description: description
+        id: 0
+        title: title
+        photos:
+          - url: url
+            content: content
+          - url: url
+            content: content
+        url: url
+      properties:
+        id:
+          format: int32
+          type: integer
+        url:
+          type: string
+        date:
+          type: string
+        title:
+          type: string
+        price:
+          format: float
+          type: number
+        description:
+          type: string
+        photos:
+          items:
+            $ref: '#/components/schemas/Photo'
+          type: array
+        subCategory:
+          $ref: '#/components/schemas/SubCategory'
+      type: object
+    MainCategory:
+      example:
+        id: 1
+        title: title
+        url: url
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+        id:
+          format: int32
+          type: integer
+      type: object
+    Photo:
+      example:
+        url: url
+        content: content
+      properties:
+        url:
+          type: string
+        content:
+          format: byte
+          type: string
+      type: object
+    SubCategory:
+      example:
+        mainCategory:
+          id: 1
+          title: title
+          url: url
+        title: title
+        url: url
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+        mainCategory:
+          $ref: '#/components/schemas/MainCategory'
+      type: object
+    Seller:
+      properties:
+        phone:
+          type: string
+        email:
+          type: string
+        adSellerName:
+          type: string
+        adPhone:
+          type: string
+        adEmail:
+          type: string
+        adZip:
+          type: string
+        adPassword:
+          type: string
+      type: object
+    UploadRequest:
+      example:
+        bid: "12345"
+        bkod: "xyz789"
+        advertisement:
+          date: date
+          subCategory:
+            mainCategory:
+              id: 1
+              title: title
+              url: url
+            title: title
+            url: url
+          price: 6.0274563
+          description: description
+          id: 0
+          title: title
+          photos:
+            - url: url
+              content: content
+            - url: url
+              content: content
+          url: url
+        seller:
+          phone: "123456789"
+          email: "seller@example.com"
+          adSellerName: "John Doe"
+          adPhone: "987654321"
+          adEmail: "ad@example.com"
+          adZip: "12345"
+          adPassword: "password"
+      properties:
+        bid:
+          type: string
+        bkod:
+          type: string
+        advertisement:
+          $ref: '#/components/schemas/Advertisement'
+        seller:
+          $ref: '#/components/schemas/Seller'
+      type: object
+    Error:
+      example:
+        code: code
+        message: message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+      type: object
