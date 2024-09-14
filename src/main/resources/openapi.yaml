@@ -176,36 +176,12 @@ paths:
   /api/v1/upload-advertisement:
     post:
       operationId: uploadAdvertisement
-      parameters:
-      - explode: true
-        in: query
-        name: bid
+      requestBody:
         required: true
-        schema:
-          format: int64
-          type: integer
-        style: form
-      - explode: true
-        in: query
-        name: bkod
-        required: true
-        schema:
-          type: string
-        style: form
-      - explode: true
-        in: query
-        name: advertisement
-        required: true
-        schema:
-          $ref: '#/components/schemas/Advertisement'
-        style: form
-      - explode: true
-        in: query
-        name: seller
-        required: true
-        schema:
-          $ref: '#/components/schemas/Seller'
-        style: form
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadRequest'
       responses:
         "200":
           content:
@@ -411,6 +387,47 @@ components:
           type: string
         adPassword:
           type: string
+      type: object
+    UploadRequest:
+      example:
+        bid: "12345"
+        bkod: "xyz789"
+        advertisement:
+          date: date
+          subCategory:
+            mainCategory:
+              id: 1
+              title: title
+              url: url
+            title: title
+            url: url
+          price: 6.0274563
+          description: description
+          id: 0
+          title: title
+          photos:
+            - url: url
+              content: content
+            - url: url
+              content: content
+          url: url
+        seller:
+          phone: "123456789"
+          email: "seller@example.com"
+          adSellerName: "John Doe"
+          adPhone: "987654321"
+          adEmail: "ad@example.com"
+          adZip: "12345"
+          adPassword: "password"
+      properties:
+        bid:
+          type: string
+        bkod:
+          type: string
+        advertisement:
+          $ref: '#/components/schemas/Advertisement'
+        seller:
+          $ref: '#/components/schemas/Seller'
       type: object
     Error:
       example:

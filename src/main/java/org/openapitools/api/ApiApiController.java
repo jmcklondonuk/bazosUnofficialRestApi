@@ -2,12 +2,12 @@ package org.openapitools.api;
 
 import com.jackmckenzie.bazos.scraper.service.BazosScraper;
 import org.modelmapper.ModelMapper;
+import org.openapitools.model.Advertisement;
+import org.openapitools.model.Seller;
+import org.openapitools.model.UploadRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.io.IOException;
@@ -88,14 +88,10 @@ public class ApiApiController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<Integer> uploadAdvertisement(@RequestParam("bid") Long bid,
-                                                       @RequestParam("bkod") String bkod,
-                                                       @RequestParam("advertisement") org.openapitools.model.Advertisement advertisement,
-                                                       @RequestParam("seller") org.openapitools.model.Seller seller) throws IOException, InterruptedException {
-
-        com.jackmckenzie.bazos.scraper.entity.Advertisement mappedAd = modelMapper.map(advertisement, com.jackmckenzie.bazos.scraper.entity.Advertisement.class);
-        com.jackmckenzie.bazos.scraper.entity.Seller mappedSeller = modelMapper.map(seller, com.jackmckenzie.bazos.scraper.entity.Seller.class);
-        Integer adId = bazosScraper.postAdvertisement(bid, bkod, mappedAd, mappedSeller);
+    public ResponseEntity<Integer> uploadAdvertisement(@RequestBody UploadRequest uploadRequest) throws IOException, InterruptedException {
+        com.jackmckenzie.bazos.scraper.entity.Advertisement mappedAd = modelMapper.map(uploadRequest.getAdvertisement(), com.jackmckenzie.bazos.scraper.entity.Advertisement.class);
+        com.jackmckenzie.bazos.scraper.entity.Seller mappedSeller = modelMapper.map(uploadRequest.getSeller(), com.jackmckenzie.bazos.scraper.entity.Seller.class);
+        Integer adId = bazosScraper.postAdvertisement(Long.parseLong(uploadRequest.getBid()), uploadRequest.getBkod(), mappedAd, mappedSeller);
         return ResponseEntity.ok(adId);
     }
 }

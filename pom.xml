@@ -4,7 +4,7 @@
     <artifactId>bazosczserver</artifactId>
     <packaging>jar</packaging>
     <name>bazosczserver</name>
-    <version>v0.9.0</version>
+    <version>v0.9.1</version>
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

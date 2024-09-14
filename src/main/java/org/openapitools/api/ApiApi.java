@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.openapitools.model.Advertisement;
 import org.openapitools.model.Error;
 import org.openapitools.model.Seller;
+import org.openapitools.model.UploadRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -313,10 +315,7 @@ public interface ApiApi {
     /**
      * POST /api/v1/upload-advertisement : Uploads an advertisement to bazos.cz
      *
-     * @param bid           (required)
-     * @param bkod          (required)
-     * @param advertisement (required)
-     * @param seller        (required)
+     * @param uploadRequest (required)
      * @return OK (status code 200)
      * or Bad request (status code 400)
      */
@@ -339,11 +338,8 @@ public interface ApiApi {
             produces = {"application/json"}
     )
     default ResponseEntity<Integer> uploadAdvertisement(
-            @NotNull @Parameter(name = "bid", description = "", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "bid", required = true) Long bid,
-            @NotNull @Parameter(name = "bkod", description = "", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "bkod", required = true) String bkod,
-            @NotNull @Parameter(name = "advertisement", description = "", required = true, in = ParameterIn.QUERY) @Valid Advertisement advertisement,
-            @NotNull @Parameter(name = "seller", description = "", required = true, in = ParameterIn.QUERY) @Valid Seller seller
-    ) throws IOException, InterruptedException {
+            @NotNull @Parameter(name = "uploadRequest", description = "", required = true, in = ParameterIn.QUERY) @Valid @RequestBody UploadRequest uploadRequest
+            ) throws IOException, InterruptedException {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
