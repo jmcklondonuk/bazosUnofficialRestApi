@@ -9,7 +9,7 @@ This is a REST API for interacting with bazos.cz
 ## Build
 
 I used JDK 17 and IntelliJ.
-The bulid command is ```gradlew build```
+The build command is ```gradlew build```
 
 To build a docker image, run the previous command and then
 ```docker build -t bazoscz-server .```
